@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "812173241771",
+    "project_id": "acualert-2023",
+    "storage_bucket": "acualert-2023.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812173241771:android:9363e7182b1e5627eab6ee",
+        "android_client_info": {
+          "package_name": "com.nawasena.acualert"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0mD5puNcoMDbhKHKKv4GEeuOZlKKMHd4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
