@@ -166,3 +166,9 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
     );
   }
 }
+
+void main() {
+  runApp(CarSelectionScreen(
+      userToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1ScDB1a3ZFYTRUZTFCb0RXbklRIiwiZW1haWwiOiJidXR1dEBnbWFpbDEuY29tIiwiaWF0IjoxNjk2MjkwODQwLCJleHAiOjE2OTg4ODI4NDB9.ZP4i_lHGrEpSTHTtIAxufUsoFHvfL5ub2mm_7jJSrnI'));
+}
