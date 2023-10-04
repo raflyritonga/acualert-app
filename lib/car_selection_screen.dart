@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:acualert/app/config/config.dart';
-import 'package:acualert/app/modules/vehichle_registration/views/custom_height_screen.dart';
+import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_clearance_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -64,7 +64,7 @@ class _CarSelectionScreenState extends State<CarSelectionScreen>
 
   // Function to fetch car data from API
   getAllCars() async {
-    final getAllCarsRoute = GET_ALL_CARS;
+    final getAllCarsRoute = GET_ALL_CARS_ROUTE;
     final url = Uri.parse('$getAllCarsRoute');
 
     try {
@@ -112,27 +112,27 @@ class _CarSelectionScreenState extends State<CarSelectionScreen>
   }
 
   // Function to navigate to vehicle height screen
-  _navigateToVehicleHeightScreen(BuildContext context, CarData selectedCar) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VehicleHeightScreen(
-          selectedCarName: selectedCar.productName,
-          selectedCarType: selectedCar.productType,
-          selectedCarBrand: selectedCar.productBrand,
-          selectedGroundClearance: selectedCar.groundClearance,
-          selectedCarLogoPath: selectedCar.productBrandLogoPath,
-          selectedCarImagePath: selectedCar.productImagePath,
-        ),
-      ),
-    ).then((result) {
-      if (result != null) {
-        setState(() {
-          selectedCarType = result;
-        });
-      }
-    });
-  }
+  // _navigateToVehicleHeightScreen(BuildContext context, CarData selectedCar) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => VehicleHeightScreen(
+  //         selectedCarName: selectedCar.productName,
+  //         selectedCarType: selectedCar.productType,
+  //         selectedCarBrand: selectedCar.productBrand,
+  //         selectedGroundClearance: selectedCar.groundClearance,
+  //         selectedCarLogoPath: selectedCar.productBrandLogoPath,
+  //         selectedCarImagePath: selectedCar.productImagePath,
+  //       ),
+  //     ),
+  //   ).then((result) {
+  //     if (result != null) {
+  //       setState(() {
+  //         selectedCarType = result;
+  //       });
+  //     }
+  //   });
+  // }
 
   // void _filterCarTypes(String query) {
   //   setState(() {

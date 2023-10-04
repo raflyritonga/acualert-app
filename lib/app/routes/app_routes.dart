@@ -1,4 +1,7 @@
+import 'package:get/get.dart';
+// Screens
 import 'package:acualert/app/modules/vehichle_registration/views/car_selection_screen.dart';
+import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_clearance_screen.dart';
 import 'package:acualert/app/modules/vehichle_registration/views/motorcycle_selection_screen.dart';
 import 'package:acualert/app/modules/vehichle_registration/views/vehicle_type_selection_screen.dart';
 import 'package:acualert/app/routes/route_names.dart';
@@ -7,7 +10,6 @@ import '../modules/intro/views/intro_screen.dart';
 import '../modules/auths/views/signup_screen.dart';
 import '../modules/home/views/home_screen.dart';
 import '../modules/map/views/map_screen-copy.dart';
-import 'package:get/get.dart';
 // Controllers
 import '../modules/auths/controllers/signin_controller.dart';
 import '../modules/vehichle_registration/views/vehicle_type_selection_screen.dart';
@@ -36,16 +38,18 @@ class AppRoutes {
     ),
     GetPage(
       name: RouteName.vehicle_registration_car,
-      page: () => CarSelectionScreen(userToken: userToken,),
+      page: () => CarSelectionScreen(
+        userToken: userToken,
+      ),
     ),
+    // GetPage(
+    //   name: RouteName.custom_ground_clearance,
+    //   page: () => CustomGroundClearanceScreen(car: userToken, userToken: userToken),
+    // ),
     GetPage(
       name: RouteName.vehicle_registration_motorcyle,
       page: () => MotorcycleSelectionScreen(),
     ),
-    // GetPage(
-    //   name: RouteName.vehicle_custom_height,
-    //   page: () => VehicleHeightScreen(),
-    // ),
     GetPage(
       name: RouteName.map,
       page: () => MyGMap(),

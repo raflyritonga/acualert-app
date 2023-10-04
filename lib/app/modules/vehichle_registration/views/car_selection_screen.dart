@@ -1,123 +1,166 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
+import 'package:acualert/app/config/config.dart';
+import 'package:acualert/app/modules/auths/controllers/signin_controller.dart';
+import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_clearance_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import '../../../config/config.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
+
+class Car {
+  final String product_name;
+  final String product_brand;
+  final String product_type;
+  final num ground_clearance;
+  final String product_brand_logo_token;
+  final String product_image_token;
+
+  Car({
+    required this.product_name,
+    required this.product_brand,
+    required this.product_type,
+    required this.ground_clearance,
+    required this.product_brand_logo_token,
+    required this.product_image_token,
+  });
+
+  String toString() {
+    return 'Car{product_name: $product_name, product_brand: $product_brand, ground_clearance: $ground_clearance, product_type: $product_type, product_image_token: $product_image_token, product_brand_logo_token: $product_brand_logo_token}';
+  }
+}
 
 class CarSelectionScreen extends StatefulWidget {
   final userToken;
   const CarSelectionScreen({required this.userToken, Key? key})
       : super(key: key);
-
   @override
   _CarSelectionScreenState createState() => _CarSelectionScreenState();
 }
 
 class _CarSelectionScreenState extends State<CarSelectionScreen> {
-  Map<String, dynamic> data = {};
-  List<dynamic> filteredData = [];
   TextEditingController searchController = TextEditingController();
-  dynamic selectedData;
+  String searchText = '';
+  final Map<String, Car> cars = {};
+  List<Car> filteredCars = [];
+
+  late final String userId;
+  late final String email;
+  late DateTime expirationDate;
+  Map<String, dynamic> decodedUserToken = JwtDecoder.decode(userToken);
+
+  void decodingTokenChecker() {
+    if (decodedUserToken != null) {
+      // You can access the claims and other information in the JWT like this:
+      userId = decodedUserToken["id"]; // Subject claim
+      email = decodedUserToken["email"];
+      expirationDate = JwtDecoder.getExpirationDate(userToken);
+
+      print("User ID: $userId");
+      print("Email: $email");
+      print("Token expiration date: $expirationDate");
+    } else {
+      // Handle invalid JWT token
+      print("Invalid JWT token");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    getAllCars();
+    decodingTokenChecker();
+    fetchAllCars();
+    filteredCars = cars.values.toList();
   }
 
-  Future<void> getAllCars() async {
-    final getAllCarsRoute = GET_ALL_CARS;
-    final url = Uri.parse('$getAllCarsRoute');
+  void filterProducts() {
+    setState(() {
+      filteredCars = cars.values
+          .where((car) =>
+              car.product_name.toLowerCase().contains(searchText.toLowerCase()))
+          .toList();
+    });
+  }
+
+  Future<Map<String, Car>> fetchAllCars() async {
+    final apiUrl = GET_ALL_CARS_ROUTE;
 
     try {
-      final res =
-          await http.get(url, headers: {'Content-Type': 'application/json'});
+      final response = await http.get(Uri.parse(apiUrl));
 
-      var resStatusCode = res.statusCode;
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
 
-      if (resStatusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(res.body);
-        final List<dynamic> items = responseData['items'] ?? [];
-        setState(() {
-          data = responseData;
-          filteredData = List.from(items);
+        data.forEach((key, value) {
+          cars[key] = Car(
+            product_name: value['product-name'],
+            product_brand: value['product-brand'],
+            product_type: value['product-type'],
+            ground_clearance: value['ground-clearance'],
+            product_brand_logo_token: value['product-brand-logo-token'],
+            product_image_token: value['product-image-token'],
+          );
         });
-        print(resStatusCode);
-        print(data);
+
+        return cars;
       } else {
-        print(resStatusCode);
+        throw Exception('Failed to fetch data from the API');
       }
-    } catch (error) {
-      print('Error: $error');
+    } catch (e) {
+      throw Exception('Error: $e');
     }
   }
 
-  void filterData(String query) {
-    setState(() {
-      filteredData = data['items'].where((item) {
-        final productName =
-            item['product-name']?.toString()?.toLowerCase() ?? '';
-        return productName.contains(query.toLowerCase());
-      }).toList();
-    });
-  }
+  addVehicle(userId, type, vehicle) async {
+    final vehicleRegistration = VEHICLE_REGISTRATION_ROUTE;
+    final url = Uri.parse('${vehicleRegistration}');
 
-  void selectItem(dynamic item) {
-    setState(() {
-      selectedData = item;
-      print('selected data: $selectedData');
-    });
-  }
+    if (userId != "" && type != "" && vehicle != "") {
+      var requestBody = {
+        'userId': userId,
+        'vehicleType': type,
+        'vehicle': vehicle + "-data",
+      };
 
-  void navigateToNextPage() {
-    if (selectedData != null) {
-      Get.toNamed('/home');
+      try {
+        final res = await http.put(url,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(requestBody));
+
+        var resStatusCode = res.statusCode;
+        var resBody = jsonEncode(res.body);
+
+        if (resStatusCode == 200) {
+          // Registration successful
+          print(resStatusCode);
+          return print(resBody);
+        } else {
+          print(resStatusCode);
+          return print(resBody);
+        }
+      } catch (error) {
+        // Handle network or other errors here
+        print('Error: $error');
+      }
+    } else {
+      return print("required field");
     }
   }
-
-  // Future<Uint8List?> fetchLogo(int index) async {
-  //   if (index >= 0 && index < filteredData.length) {
-  //     final item = filteredData[index];
-  //     final imageUrl = item["product-brand-logo-token"];
-
-  //     try {
-  //       final response = await http.get(Uri.parse(imageUrl));
-
-  //       if (response.statusCode == 200) {
-  //         final contentType = response.headers['content-type'];
-  //         if (contentType != null && contentType.startsWith('image')) {
-  //           return response.bodyBytes;
-  //         } else {
-  //           throw Exception('Invalid image content type');
-  //         }
-  //       } else {
-  //         throw Exception(
-  //             'Failed to load image, status code: ${response.statusCode}');
-  //       }
-  //     } catch (error) {
-  //       throw Exception('Error loading image: $error');
-  //     }
-  //   } else {
-  //     throw Exception('Invalid index');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Car Selection'),
+        title: Text('Search Screen'),
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
-              controller: searchController,
               onChanged: (value) {
-                filterData(value);
+                searchText = value;
+                filterProducts();
               },
               decoration: InputDecoration(
                 labelText: 'Search',
@@ -128,35 +171,16 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: filteredData.length,
+              itemCount: filteredCars.length,
               itemBuilder: (context, index) {
-                final item = filteredData[index];
-                return GestureDetector(
+                final car = filteredCars[index];
+                return ListTile(
+                  title: Text(car.product_name),
                   onTap: () {
-                    selectItem(item);
-                    navigateToNextPage();
+                    // addVehicle(userId, "cars", car.product_name.toLowerCase());
+                    Get.to(CustomGroundClearanceScreen(
+                        car: car, userToken: userToken));
                   },
-                  child: ListTile(
-                    title: Text(
-                        '${item['product-brand-logo-token']} ${item['product-name']} ${item['ground-clearance']}'),
-                    // leading: FutureBuilder<Uint8List?>(
-                    //   future: fetchLogo(index),
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.connectionState == ConnectionState.done &&
-                    //         snapshot.data != null) {
-                    //       return SvgPicture.memory(
-                    //         snapshot.data!,
-                    //         width: 32,
-                    //         height: 32,
-                    //       );
-                    //     } else if (snapshot.hasError) {
-                    //       return Text('Error: ${snapshot.error}');
-                    //     } else {
-                    //       return CircularProgressIndicator();
-                    //     }
-                    //   },
-                    // ),
-                  ),
                 );
               },
             ),
@@ -165,10 +189,4 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(CarSelectionScreen(
-      userToken:
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Im1ScDB1a3ZFYTRUZTFCb0RXbklRIiwiZW1haWwiOiJidXR1dEBnbWFpbDEuY29tIiwiaWF0IjoxNjk2MjkwODQwLCJleHAiOjE2OTg4ODI4NDB9.ZP4i_lHGrEpSTHTtIAxufUsoFHvfL5ub2mm_7jJSrnI'));
 }

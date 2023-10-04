@@ -10,4 +10,5 @@ abstract class RouteName {
   static const home = '/home';
   static const profile = '/profile';
   static const map = '/map';
+  static const custom_ground_clearance = '/custom-ground-clearance';
 }

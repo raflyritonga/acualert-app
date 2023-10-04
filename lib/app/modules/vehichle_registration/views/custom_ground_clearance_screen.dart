@@ -1,8 +1,36 @@
+import 'dart:convert';
+
+import 'package:acualert/app/config/config.dart';
+import 'package:acualert/app/modules/auths/controllers/signin_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:jwt_decoder/jwt_decoder.dart';
 import 'registration_success_screen.dart';
+// class Car {
+//   final String product_name;
+//   final String product_brand;
+//   final String product_type;
+//   final num ground_clearance;
+//   final String product_brand_logo_token;
+//   final String product_image_token;
+
+//   Car({
+//     required this.product_name,
+//     required this.product_brand,
+//     required this.product_type,
+//     required this.ground_clearance,
+//     required this.product_brand_logo_token,
+//     required this.product_image_token,
+//   });
+
+//   String toString() {
+//     return 'Car{product_name: $product_name, product_brand: $product_brand, ground_clearance: $ground_clearance, product_type: $product_type, product_image_token: $product_image_token, product_brand_logo_token: $product_brand_logo_token}';
+//   }
+// }
 
 class SuperCustomCupertinoPicker extends CupertinoPicker {
   SuperCustomCupertinoPicker({
@@ -21,34 +49,42 @@ class SuperCustomCupertinoPicker extends CupertinoPicker {
         );
 }
 
-class VehicleHeightScreen extends StatefulWidget {
-  final String selectedCarName;
-  final String selectedCarType;
-  final String selectedCarBrand;
-  final String selectedGroundClearance;
-  final String selectedCarLogoPath;
-  final String selectedCarImagePath;
-
-  VehicleHeightScreen({
-    required this.selectedCarName,
-    required this.selectedCarType,
-    required this.selectedCarBrand,
-    required this.selectedGroundClearance,
-    required this.selectedCarLogoPath,
-    required this.selectedCarImagePath,
-  });
-
+class CustomGroundClearanceScreen extends StatefulWidget {
+  final car;
+  final userToken;
+  const CustomGroundClearanceScreen(
+      {required this.car, required this.userToken, Key? key})
+      : super(key: key);
   @override
-  _VehicleHeightScreenState createState() => _VehicleHeightScreenState();
+  _CustomGroundClearanceScreenState createState() =>
+      _CustomGroundClearanceScreenState();
 }
 
-class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
+class _CustomGroundClearanceScreenState
+    extends State<CustomGroundClearanceScreen> {
+  late num defaultGroundClearance;
+  num? customGroundClearance;
   bool isCustomHeight = false;
-  double customHeight = 22; // Default custom height value
-  double initialCustomHeight = 22; // Initial custom height value for reference
+
+  late final String userId;
+  late final String email;
+  late DateTime expirationDate;
+  Map<String, dynamic> decodedUserToken = JwtDecoder.decode(userToken);
+
+  @override
+  void initState() {
+    super.initState();
+    defaultGroundClearance = widget.car.ground_clearance;
+    customGroundClearance = 90;
+    // defaultGroundClearance = widget.car.ground_clearance;
+    // defaultGroundClearance = widget.car?.ground_clearance ?? 0;
+    print('default ground clearance = ${defaultGroundClearance}');
+    print('custom ground clearance = ${customGroundClearance}');
+    decodingTokenChecker();
+  }
 
   void _navigateBack(BuildContext context) {
-    Navigator.pop(context, widget.selectedCarType);
+    Navigator.pop(context, widget.car);
   }
 
   void _navigateToRegistrationSuccessScreen(BuildContext context) {
@@ -78,8 +114,8 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
             SizedBox(height: 50),
             _buildCarDetails(),
             SizedBox(height: 30),
-            Image.asset(
-              widget.selectedCarImagePath,
+            Image.network(
+              'https://firebasestorage.googleapis.com/v0/b/acualert-services-2023.appspot.com/o/vehicles%2FlandCruiser%202.jpg?alt=media&token=2a4403ee-0eb0-46c2-a16a-342eb0698f1e',
               height: 180,
               width: 180,
               fit: BoxFit.contain,
@@ -130,18 +166,19 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
-          SizedBox(width: 35),
-          Image.asset(
-            widget.selectedCarLogoPath,
-            height: 40,
-            width: 40,
+          SizedBox(width: 25),
+          Image.network(
+            'https://firebasestorage.googleapis.com/v0/b/acualert-services-2023.appspot.com/o/vehicles%2FlandCruiser%202.png?alt=media&token=85dad9c1-258b-4090-ae72-f50170d86ff4',
+            height: 60,
+            width: 60,
+            fit: BoxFit.contain,
           ),
           SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.selectedCarType.split(' ').sublist(1).join(' '),
+                widget.car.product_name.split(' ')[0],
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
@@ -150,7 +187,7 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
               ),
               SizedBox(height: 3),
               Text(
-                widget.selectedCarType.split(' ')[0],
+                widget.car.product_brand.split(' ')[0],
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -171,7 +208,7 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
         children: [
           Center(
             child: Text(
-              "Vehicle Height",
+              "Ground Clearance",
               style: TextStyle(
                 fontSize: 25,
                 fontWeight: FontWeight.bold,
@@ -179,7 +216,7 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
               ),
             ),
           ),
-          SizedBox(height: 30),
+          SizedBox(height: 15),
           Center(
             child: Container(
               child: CustomSlidingSegmentedControl(
@@ -205,7 +242,8 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
                   setState(() {
                     isCustomHeight = index == 1;
                     if (isCustomHeight) {
-                      customHeight = initialCustomHeight;
+                      // Set customGroundClearance to default when switching to Custom
+                      customGroundClearance = 0;
                     }
                   });
                 },
@@ -243,8 +281,11 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
                                 itemExtent: 60,
                                 onSelectedItemChanged: (value) {
                                   setState(() {
-                                    customHeight = value.toDouble() + 1;
+                                    // Update customGroundClearance with the selected value
+                                    customGroundClearance = value;
                                     HapticFeedback.heavyImpact();
+                                    print(
+                                        "Custom Ground Clearance: $customGroundClearance");
                                   });
 
                                   // Play a click sound when the selection changes
@@ -253,7 +294,7 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
                                 children: List<Widget>.generate(
                                   99,
                                   (int index) {
-                                    final text = (index + 1).toString();
+                                    final text = (index).toString();
                                     return Center(
                                       child: Text(
                                         text,
@@ -273,7 +314,7 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
                             : Align(
                                 alignment: Alignment.center,
                                 child: Text(
-                                  customHeight.toInt().toString(),
+                                  defaultGroundClearance.toString(),
                                   style: TextStyle(
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
@@ -302,11 +343,99 @@ class _VehicleHeightScreenState extends State<VehicleHeightScreen> {
     );
   }
 
+  void decodingTokenChecker() {
+    if (decodedUserToken != null) {
+      // You can access the claims and other information in the JWT like this:
+      userId = decodedUserToken["id"]; // Subject claim
+      email = decodedUserToken["email"];
+      expirationDate = JwtDecoder.getExpirationDate(userToken);
+
+      print("User ID: $userId");
+      print("Email: $email");
+      print("Token expiration date: $expirationDate");
+    } else {
+      // Handle invalid JWT token
+      print("Invalid JWT token");
+    }
+  }
+
+  addVehicle(userId, type, vehicle, customGC) async {
+    final vehicleRegistration = VEHICLE_REGISTRATION_ROUTE;
+    final urlVehicleRegistration = Uri.parse('${vehicleRegistration}');
+
+    if (userId != "" && type != "" && vehicle != "") {
+      var requestBody = {
+        'userId': userId,
+        'vehicleType': type,
+        'vehicle': vehicle + "-data",
+      };
+
+      try {
+        final res = await http.put(urlVehicleRegistration,
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode(requestBody));
+
+        var resStatusCode = res.statusCode;
+        var resBody = jsonEncode(res.body);
+
+        if (resStatusCode == 200) {
+          // Registration successful
+          print(resStatusCode);
+          return print(resBody);
+        } else {
+          print(resStatusCode);
+          return print(resBody);
+        }
+      } catch (error) {
+        // Handle network or other errors here
+        print('Error: $error');
+      }
+    } else {
+      return print("required field");
+    }
+  }
+
+  updateGroundClearance(userId, vehicle, customGC) async {
+    final updateGroundClearance = UPDATE_GROUND_CLEARANCE_ROUTE;
+    final urlUpdateGroundClearance = Uri.parse('${updateGroundClearance}');
+    var requestBody = {
+      'userId': userId,
+      'vehicle': vehicle + "-data",
+      'groundClearance': customGC
+    };
+    try {
+      final res = await http.put(urlUpdateGroundClearance,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(requestBody));
+
+      var resStatusCode = res.statusCode;
+      var resBody = jsonEncode(res.body);
+
+      if (resStatusCode == 200) {
+        // Registration successful
+        print(resStatusCode);
+        return print(resBody);
+      } else {
+        print(resStatusCode);
+        return print(resBody + 'gagal update');
+      }
+    } catch (error) {
+      // Handle network or other errors here
+      print('Error: $error');
+    }
+  }
+
   Widget _buildContinueButton() {
     return Padding(
       padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
       child: ElevatedButton(
-        onPressed: () {
+        onPressed: () async {
+          await addVehicle(userId, "cars",
+              widget.car.product_name.toLowerCase(), customGroundClearance);
+          if (customGroundClearance != 0) {
+            await updateGroundClearance(userId,
+                widget.car.product_name.toLowerCase(), customGroundClearance);
+          }
           _navigateToRegistrationSuccessScreen(context);
         },
         style: ElevatedButton.styleFrom(

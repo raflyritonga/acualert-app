@@ -1,4 +1,3 @@
-import 'package:acualert/registration_success_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'app/routes/app_routes.dart';

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:acualert/app/config/config.dart';
 import 'package:flutter/material.dart';
-import 'custom_height_screen.dart'; // Impor halaman baru
+import 'custom_ground_clearance_screen.dart'; // Impor halaman baru
 import 'package:http/http.dart' as http;
 
 class CarData {
@@ -73,7 +73,7 @@ class _MotorcycleSelectionScreenState extends State<MotorcycleSelectionScreen>
   }
 
   getAllCars() async {
-    final getAllCarsRoute = GET_ALL_CARS;
+    final getAllCarsRoute = GET_ALL_MOTORCYLES_ROUTE;
     final url = Uri.parse('$getAllCarsRoute');
 
     try {
@@ -139,27 +139,27 @@ class _MotorcycleSelectionScreenState extends State<MotorcycleSelectionScreen>
     });
   }
 
-  _navigateToVehicleHeightScreen(BuildContext context, CarData selectedCar) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VehicleHeightScreen(
-          selectedCarName: selectedCar.productName,
-          selectedCarType: selectedCar.productType,
-          selectedCarBrand: selectedCar.productBrand,
-          selectedGroundClearance: selectedCar.groundClearance,
-          selectedCarLogoPath: selectedCar.productBrandLogoPath,
-          selectedCarImagePath: selectedCar.productImagePath,
-        ),
-      ),
-    ).then((result) {
-      if (result != null) {
-        setState(() {
-          selectedCarType = result;
-        });
-      }
-    });
-  }
+  // _navigateToVehicleHeightScreen(BuildContext context, CarData selectedCar) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(
+  //       builder: (context) => VehicleHeightScreen(
+  //         selectedCarName: selectedCar.productName,
+  //         selectedCarType: selectedCar.productType,
+  //         selectedCarBrand: selectedCar.productBrand,
+  //         selectedGroundClearance: selectedCar.groundClearance,
+  //         selectedCarLogoPath: selectedCar.productBrandLogoPath,
+  //         selectedCarImagePath: selectedCar.productImagePath,
+  //       ),
+  //     ),
+  //   ).then((result) {
+  //     if (result != null) {
+  //       setState(() {
+  //         selectedCarType = result;
+  //       });
+  //     }
+  //   });
+  // }
 
   void _filterCarTypes(String query) {
     setState(() {
