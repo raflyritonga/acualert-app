@@ -129,30 +129,6 @@ class SignUpScreen extends StatelessWidget {
                   _buildFormField("Phone", data.phoneController),
                   _buildFormField("Password", data.passwordController,
                       isPassword: false),
-                  // Container(
-                  //   alignment: Alignment.centerLeft,
-                  //   child: Column(
-                  //     mainAxisAlignment: MainAxisAlignment.center,
-                  //     children: [
-                  //       Row(
-                  //         mainAxisAlignment: MainAxisAlignment.center,
-                  //         children: [
-                  //           Obx(() => Checkbox(
-                  //                 onChanged: (value) {
-                  //                   signUpController
-                  //                       .togglePrivacyPolicy(value!);
-                  //                 },
-                  //                 value: data.acceptPrivacyPolicy.value,
-                  //               )),
-                  //           Text(
-                  //             "By continuing you accept our Privacy Policy",
-                  //             style: TextStyle(fontSize: 12),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                   SizedBox(height: 8),
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),

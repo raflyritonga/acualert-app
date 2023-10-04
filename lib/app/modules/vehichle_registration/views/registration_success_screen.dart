@@ -1,8 +1,13 @@
+import 'package:acualert/app/modules/auths/controllers/signin_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:msh_checkbox/msh_checkbox.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class RegistrationSuccessScreen extends StatefulWidget {
+  final userToken;
+  const RegistrationSuccessScreen({required this.userToken, Key? key})
+      : super(key: key);
   @override
   _RegistrationSuccessScreenState createState() =>
       _RegistrationSuccessScreenState();
@@ -17,6 +22,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen> {
     super.initState();
     _playSuccessSound();
     _startAnimation();
+    print('user token di screen: ' + userToken);
   }
 
   Future<void> _playSuccessSound() async {
@@ -84,8 +90,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen> {
               SizedBox(height: 80),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(
-                      context, '/home'); // Navigate to HomeScreen
+                  Get.offAllNamed('/home', arguments: userToken);
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(

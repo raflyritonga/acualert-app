@@ -1,3 +1,4 @@
+import 'package:acualert/app/modules/vehichle_registration/views/registration_success_screen.dart';
 import 'package:get/get.dart';
 // Screens
 import 'package:acualert/app/modules/vehichle_registration/views/car_selection_screen.dart';
@@ -5,14 +6,14 @@ import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_c
 import 'package:acualert/app/modules/vehichle_registration/views/motorcycle_selection_screen.dart';
 import 'package:acualert/app/modules/vehichle_registration/views/vehicle_type_selection_screen.dart';
 import 'package:acualert/app/routes/route_names.dart';
-import '../modules/auths/views/signin_screen.dart';
-import '../modules/intro/views/intro_screen.dart';
-import '../modules/auths/views/signup_screen.dart';
-import '../modules/home/views/home_screen.dart';
-import '../modules/map/views/map_screen-copy.dart';
+import 'package:acualert/app/modules/auths/views/signin_screen.dart';
+import 'package:acualert/app/modules/intro/views/intro_screen.dart';
+import 'package:acualert/app/modules/auths/views/signup_screen.dart';
+import 'package:acualert/app/modules/home/views/home_screen.dart';
+import 'package:acualert/app/modules/map/views/map_screen-copy.dart';
 // Controllers
-import '../modules/auths/controllers/signin_controller.dart';
-import '../modules/vehichle_registration/views/vehicle_type_selection_screen.dart';
+import 'package:acualert/app/modules/auths/controllers/signin_controller.dart';
+import 'package:acualert/app/modules/vehichle_registration/views/vehicle_type_selection_screen.dart';
 
 class AppRoutes {
   static final screens = [
@@ -30,7 +31,9 @@ class AppRoutes {
     ),
     GetPage(
       name: RouteName.home,
-      page: () => HomeScreen(),
+      page: () => HomeScreen(
+        userToken: userToken,
+      ),
     ),
     GetPage(
       name: RouteName.vehicle_registration,

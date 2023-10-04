@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'registration_success_screen.dart';
@@ -53,7 +54,7 @@ class _CustomGroundClearanceScreenState
   void initState() {
     super.initState();
     defaultGroundClearance = widget.vehicle.ground_clearance;
-    customGroundClearance = 90;
+    customGroundClearance = 0;
     print('default ground clearance = ${defaultGroundClearance}');
     print('custom ground clearance = ${customGroundClearance}');
     decodingTokenChecker();
@@ -70,7 +71,7 @@ class _CustomGroundClearanceScreenState
         transitionDuration: Duration(
             seconds: 0), // Set the transition duration to 0 to remove animation
         pageBuilder: (context, animation, secondaryAnimation) =>
-            RegistrationSuccessScreen(),
+            RegistrationSuccessScreen(userToken: userToken),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return child;
         },

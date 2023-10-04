@@ -30,6 +30,7 @@ environment:
 dependencies:
   animated_text_kit: ^4.2.2
   audioplayers: ^5.0.0
+  carousel_slider: ^4.2.1
   circle_nav_bar: ^2.0.1+1
   cupertino_icons: ^1.0.2
   custom_sliding_segmented_control: ^1.7.5

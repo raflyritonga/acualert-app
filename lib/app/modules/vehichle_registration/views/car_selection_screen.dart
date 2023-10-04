@@ -91,26 +91,71 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
     }
   }
 
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(top: 20, left: 16, right: 170),
+      color: Colors.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: () {
+              // _navigateToCarModelSelection(context);
+            },
+            icon: Icon(Icons.arrow_back, color: Colors.black),
+          ),
+          Text(
+            "Step 2 of 3",
+            style: TextStyle(color: Colors.black),
+          ),
+          // Tidak ada tombol "Skip" di sini
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeading() {
+    return Container(
+      padding: EdgeInsets.all(16.0),
+      child: Text(
+        "Insert Your Car Type",
+        style: TextStyle(
+          fontSize: 26.0,
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Search Screen'),
-      ),
       body: Column(
         children: [
+          SizedBox(height: 30),
+          _buildHeader(context),
+          SizedBox(height: 30),
+          _buildHeading(),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.fromLTRB(35, 30, 35, 5),
             child: TextField(
               onChanged: (value) {
                 searchText = value;
                 filterProducts();
               },
               decoration: InputDecoration(
-                labelText: 'Search',
-                hintText: 'Search for items...',
-                prefixIcon: Icon(Icons.search),
-              ),
+                  hintText: 'Search for items...',
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Icon(Icons.search),
+                  ),
+                  fillColor: Colors.white,
+                  filled: true,
+                  labelStyle: TextStyle(color: Colors.black),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  )),
             ),
           ),
           Expanded(
