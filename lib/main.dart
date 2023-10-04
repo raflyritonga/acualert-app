@@ -22,35 +22,3 @@ class AcualertApp extends StatelessWidget {
     );
   }
 }
-
-
-
-// routes: {
-//         '/boarding': (context) => BoardingPage(),
-//         '/vehicle_selection': (context) => VehicleSelectionScreen(),
-//         '/car_model_selection': (context) => CarModelSelectionScreen(),
-//         '/registration_success': (context) => RegistrationSuccessScreen(),
-//         '/car_type_selection': (context) {
-//           final carModel =
-//               ModalRoute.of(context)!.settings.arguments as String?;
-//           return carModel != null
-//               ? CarTypeSelectionScreen(carModel: carModel)
-//               : Container();
-//         },
-//         '/vehicle_height': (context) {
-//           // Add route for VehicleHeightScreen
-//           final selectedCar =
-//               ModalRoute.of(context)!.settings.arguments as CarType?;
-//           return selectedCar != null
-//               ? VehicleHeightScreen(
-//                   selectedCarType: selectedCar.name,
-//                   selectedCarLogoPath: selectedCar.logoPath,
-//                   selectedCarImagePath: selectedCar.imagePath,
-//                 )
-//               : Container();
-//         },
-//         '/signin': (context) => SignInPage(),
-//         '/signup': (context) => SignUpPage(),
-//         '/home': (context) => HomeScreen(),
-//         '/location_search': (context) => LocationSearchPage(),
-//       },

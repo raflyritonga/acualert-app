@@ -1,29 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:get/get.dart';
-import '../widgets/rounded_card.dart';
-import '../widgets/vehicle_card.dart';
-import '../controllers/home_controller.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home Screen',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomeScreen(),
-    );
-  }
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class HomeScreen extends StatelessWidget {
-  final HomeController homeController = Get.put(HomeController());
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 1; // Indeks aktif pada home
 
   final List<Widget> _pages = [
     ProfilePage(),
@@ -56,7 +40,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFEAEAEA),
-      body: Obx(() => _pages[homeController.currentIndex.value]),
+      body: _pages[_currentIndex],
       bottomNavigationBar: Container(
         decoration: BoxDecoration(color: Colors.white, boxShadow: [
           BoxShadow(blurRadius: 20, color: Colors.black.withOpacity(.1))
@@ -69,7 +53,7 @@ class HomeScreen extends StatelessWidget {
               child: GNav(
                 rippleColor: Colors.grey[300]!,
                 hoverColor: Colors.grey[100]!,
-                gap: 10,
+                gap: 20,
                 activeColor: Colors.blue,
                 iconSize: 25,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -89,9 +73,11 @@ class HomeScreen extends StatelessWidget {
                     text: 'Map',
                   ),
                 ],
-                selectedIndex: homeController.currentIndex.value,
+                selectedIndex: _currentIndex,
                 onTabChange: (index) {
-                  homeController.changePage(index);
+                  setState(() {
+                    _currentIndex = index;
+                  });
                 },
               ),
             ),
@@ -116,6 +102,163 @@ class MapPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.red, // Ganti dengan konten peta sesuai kebutuhan
+    );
+  }
+}
+
+class RoundedCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(25),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          SizedBox(width: 5),
+          CircleAvatar(
+            backgroundImage: AssetImage('assets/hiskia.png'),
+            radius: 30,
+          ),
+          SizedBox(width: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Hiskia Sinaga',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class VehicleCard extends StatelessWidget {
+  final String carModel;
+  final String vehicleHeight;
+
+  VehicleCard({required this.carModel, required this.vehicleHeight});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              SizedBox(
+                width: 15,
+                height: 70,
+              ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.asset(
+                    'assets/toyota_logo.png',
+                    height: 40,
+                    width: 40,
+                  ),
+                ],
+              ),
+              SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    carModel.split(' ').sublist(1).join(' '),
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Text(
+                    carModel.split(' ')[0],
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(width: 20),
+            ],
+          ),
+          Center(
+            child: Image.asset(
+              'assets/land_cruiser.png',
+              height: 140,
+              width: 200,
+            ),
+          ),
+          Center(
+            child: Text(
+              '$vehicleHeight cm  |  suv',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+          ),
+          SizedBox(height: 30),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // Logic for Use button
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  minimumSize: Size(120, 40),
+                ),
+                child: Text("Use"),
+              ),
+              SizedBox(width: 10),
+              OutlinedButton(
+                onPressed: () {
+                  // Logic for Custom button
+                },
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  minimumSize: Size(120, 40),
+                  side: BorderSide(color: Colors.blue),
+                ),
+                child: Text(
+                  "Custom",
+                  style: TextStyle(color: Colors.blue),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

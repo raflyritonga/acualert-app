@@ -42,13 +42,9 @@ class AppRoutes {
         userToken: userToken,
       ),
     ),
-    // GetPage(
-    //   name: RouteName.custom_ground_clearance,
-    //   page: () => CustomGroundClearanceScreen(car: userToken, userToken: userToken),
-    // ),
     GetPage(
       name: RouteName.vehicle_registration_motorcyle,
-      page: () => MotorcycleSelectionScreen(),
+      page: () => MotorcycleSelectionScreen(userToken: userToken),
     ),
     GetPage(
       name: RouteName.map,

@@ -6,7 +6,6 @@ import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_c
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 class Car {
   final String product_name;
@@ -15,6 +14,7 @@ class Car {
   final num ground_clearance;
   final String product_brand_logo_token;
   final String product_image_token;
+  final String vehicle_type;
 
   Car({
     required this.product_name,
@@ -23,6 +23,7 @@ class Car {
     required this.ground_clearance,
     required this.product_brand_logo_token,
     required this.product_image_token,
+    required this.vehicle_type,
   });
 
   String toString() {
@@ -44,31 +45,9 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
   final Map<String, Car> cars = {};
   List<Car> filteredCars = [];
 
-  late final String userId;
-  late final String email;
-  late DateTime expirationDate;
-  Map<String, dynamic> decodedUserToken = JwtDecoder.decode(userToken);
-
-  void decodingTokenChecker() {
-    if (decodedUserToken != null) {
-      // You can access the claims and other information in the JWT like this:
-      userId = decodedUserToken["id"]; // Subject claim
-      email = decodedUserToken["email"];
-      expirationDate = JwtDecoder.getExpirationDate(userToken);
-
-      print("User ID: $userId");
-      print("Email: $email");
-      print("Token expiration date: $expirationDate");
-    } else {
-      // Handle invalid JWT token
-      print("Invalid JWT token");
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    decodingTokenChecker();
     fetchAllCars();
     filteredCars = cars.values.toList();
   }
@@ -99,6 +78,7 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
             ground_clearance: value['ground-clearance'],
             product_brand_logo_token: value['product-brand-logo-token'],
             product_image_token: value['product-image-token'],
+            vehicle_type: value['vehicle-type'],
           );
         });
 
@@ -108,42 +88,6 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
       }
     } catch (e) {
       throw Exception('Error: $e');
-    }
-  }
-
-  addVehicle(userId, type, vehicle) async {
-    final vehicleRegistration = VEHICLE_REGISTRATION_ROUTE;
-    final url = Uri.parse('${vehicleRegistration}');
-
-    if (userId != "" && type != "" && vehicle != "") {
-      var requestBody = {
-        'userId': userId,
-        'vehicleType': type,
-        'vehicle': vehicle + "-data",
-      };
-
-      try {
-        final res = await http.put(url,
-            headers: {'Content-Type': 'application/json'},
-            body: jsonEncode(requestBody));
-
-        var resStatusCode = res.statusCode;
-        var resBody = jsonEncode(res.body);
-
-        if (resStatusCode == 200) {
-          // Registration successful
-          print(resStatusCode);
-          return print(resBody);
-        } else {
-          print(resStatusCode);
-          return print(resBody);
-        }
-      } catch (error) {
-        // Handle network or other errors here
-        print('Error: $error');
-      }
-    } else {
-      return print("required field");
     }
   }
 
@@ -177,9 +121,8 @@ class _CarSelectionScreenState extends State<CarSelectionScreen> {
                 return ListTile(
                   title: Text(car.product_name),
                   onTap: () {
-                    // addVehicle(userId, "cars", car.product_name.toLowerCase());
                     Get.to(CustomGroundClearanceScreen(
-                        car: car, userToken: userToken));
+                        vehicle: car, userToken: userToken));
                   },
                 );
               },

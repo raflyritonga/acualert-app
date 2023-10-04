@@ -81,15 +81,6 @@ class _VehicleSelectionScreenState extends State<VehicleSelectionScreen> {
             "Step 1 of 3",
             style: TextStyle(color: Colors.black),
           ),
-          TextButton(
-            onPressed: () {
-              Get.offNamed('/home');
-            },
-            child: Text(
-              "Skip",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
         ],
       ),
     );

@@ -1,468 +1,136 @@
 import 'dart:convert';
 
 import 'package:acualert/app/config/config.dart';
+import 'package:acualert/app/modules/auths/controllers/signin_controller.dart';
+import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_clearance_screen.dart';
 import 'package:flutter/material.dart';
-import 'custom_ground_clearance_screen.dart'; // Impor halaman baru
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
-class CarData {
-  final String productName;
-  final String productType;
-  final String productBrand;
-  final String groundClearance;
-  final String productBrandLogoPath;
-  final String productImagePath;
+class Motorcycle {
+  final String product_name;
+  final String product_brand;
+  final String product_type;
+  final num ground_clearance;
+  final String product_brand_logo_token;
+  final String product_image_token;
+  final String vehicle_type;
 
-  CarData(this.productName, this.productType, this.productBrand,
-      this.groundClearance, this.productBrandLogoPath, this.productImagePath);
+  Motorcycle({
+    required this.product_name,
+    required this.product_brand,
+    required this.product_type,
+    required this.ground_clearance,
+    required this.product_brand_logo_token,
+    required this.product_image_token,
+    required this.vehicle_type,
+  });
+
+  String toString() {
+    return 'Motorcycle{product_name: $product_name, product_brand: $product_brand, ground_clearance: $ground_clearance, product_type: $product_type, product_image_token: $product_image_token, product_brand_logo_token: $product_brand_logo_token}';
+  }
 }
 
 class MotorcycleSelectionScreen extends StatefulWidget {
-  // final String carModel;
-
-  // MotorcycleSelectionScreen({required this.MotoModel});
-
+  final userToken;
+  const MotorcycleSelectionScreen({required this.userToken, Key? key})
+      : super(key: key);
   @override
   _MotorcycleSelectionScreenState createState() =>
       _MotorcycleSelectionScreenState();
 }
 
-class _MotorcycleSelectionScreenState extends State<MotorcycleSelectionScreen>
-    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
-  late List<CarData> carTypes;
-  List<CarData> filteredCarTypes = [];
-  String selectedCarType = '';
+class _MotorcycleSelectionScreenState extends State<MotorcycleSelectionScreen> {
   TextEditingController searchController = TextEditingController();
-  FocusNode searchFocusNode = FocusNode();
-  bool isCarTypeSelected = false;
-  String carModel =
-      ''; // Ini adalah definisi dan inisialisasi variabel carModel
+  String searchText = '';
+  final Map<String, Motorcycle> motorcycles = {};
+  List<Motorcycle> filteredMotorcycles = [];
 
   @override
   void initState() {
     super.initState();
-    // carModel = widget
-    //     .carModel; // Inisialisasi variabel carModel dengan nilai dari widget
-    // carTypes =
-    //     getCarTypesForModel(carModel); // Gunakan variabel carModel di sini
+    fetchAllMotorcycles();
+    filteredMotorcycles = motorcycles.values.toList();
+  }
 
-    getAllCars();
-    Future.delayed(Duration(milliseconds: 300), () {
-      searchFocusNode.requestFocus();
+  void filterProducts() {
+    setState(() {
+      filteredMotorcycles = motorcycles.values
+          .where((motorcycle) => motorcycle.product_name
+              .toLowerCase()
+              .contains(searchText.toLowerCase()))
+          .toList();
     });
-
-    WidgetsBinding.instance.addObserver(this);
   }
 
-  @override
-  bool get wantKeepAlive => true;
-
-  @override
-  void didChangeMetrics() {
-    if (isCarTypeSelected) {
-      if (MediaQuery.of(context).viewInsets.bottom == 0) {
-        _clearSelection();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  getAllCars() async {
-    final getAllCarsRoute = GET_ALL_MOTORCYLES_ROUTE;
-    final url = Uri.parse('$getAllCarsRoute');
+  Future<Map<String, Motorcycle>> fetchAllMotorcycles() async {
+    final apiUrl = GET_ALL_MOTORCYCLES_ROUTE;
 
     try {
-      final res =
-          await http.get(url, headers: {'Content-Type': 'application/json'});
+      final response = await http.get(Uri.parse(apiUrl));
 
-      var resStatusCode = res.statusCode;
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
 
-      if (resStatusCode == 200) {
-        final List<dynamic> data = jsonDecode(res.body);
-        List<CarData> carList = [];
-
-        for (var item in data) {
-          CarData car = CarData(
-            item['product-name'],
-            item['product-type'],
-            item['product-brand'],
-            item['ground-clearance'],
-            item['product-brand-logo-token'],
-            item['product-image-token'],
+        data.forEach((key, value) {
+          motorcycles[key] = Motorcycle(
+            product_name: value['product-name'],
+            product_brand: value['product-brand'],
+            product_type: value['product-type'],
+            ground_clearance: value['ground-clearance'],
+            product_brand_logo_token: value['product-brand-logo-token'],
+            product_image_token: value['product-image-token'],
+            vehicle_type: value['vehicle-type'],
           );
-          carList.add(car);
-        }
-
-        setState(() {
-          carTypes = carList;
         });
 
-        print(resStatusCode);
-        return print(data);
+        return motorcycles;
       } else {
-        return print(resStatusCode);
+        throw Exception('Failed to fetch data from the API');
       }
-    } catch (error) {
-      // Handle network or other errors here
-      print('Error: $error');
+    } catch (e) {
+      throw Exception('Error: $e');
     }
-  }
-  // void _navigateToCarModelSelection(BuildContext context) {
-  //   FocusScope.of(context).unfocus();
-
-  //   Future.delayed(Duration(milliseconds: 300), () {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => CarModelSelectionScreen()),
-  //     );
-  //   });
-  // }
-
-  void _navigateToCarDetails(BuildContext context, CarData carType) {
-    setState(() {
-      selectedCarType = carType.productName;
-      filteredCarTypes.clear();
-      searchController.clear();
-      isCarTypeSelected = true;
-    });
-  }
-
-  void _clearSelection() {
-    setState(() {
-      selectedCarType = '';
-      isCarTypeSelected = false;
-    });
-  }
-
-  // _navigateToVehicleHeightScreen(BuildContext context, CarData selectedCar) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => VehicleHeightScreen(
-  //         selectedCarName: selectedCar.productName,
-  //         selectedCarType: selectedCar.productType,
-  //         selectedCarBrand: selectedCar.productBrand,
-  //         selectedGroundClearance: selectedCar.groundClearance,
-  //         selectedCarLogoPath: selectedCar.productBrandLogoPath,
-  //         selectedCarImagePath: selectedCar.productImagePath,
-  //       ),
-  //     ),
-  //   ).then((result) {
-  //     if (result != null) {
-  //       setState(() {
-  //         selectedCarType = result;
-  //       });
-  //     }
-  //   });
-  // }
-
-  void _filterCarTypes(String query) {
-    setState(() {
-      if (query.isEmpty) {
-        filteredCarTypes.clear();
-      } else {
-        filteredCarTypes = carTypes.where((carType) {
-          return carType.productName
-              .toLowerCase()
-              .contains(query.toLowerCase());
-        }).toList();
-      }
-    });
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(top: 70, left: 16, right: 16),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // IconButton(
-          //   onPressed: () {
-          //     _navigateToCarModelSelection(context);
-          //   },
-          //   icon: Icon(Icons.arrow_back, color: Colors.black),
-          // ),
-          Text(
-            "Step 2 of 3",
-            style: TextStyle(color: Colors.black),
-          ),
-          // TextButton(
-          //   onPressed: () {
-          //     // Logic to skip
-          //   },
-          //   child: Text(
-          //     "Skip",
-          //     style: TextStyle(color: Colors.black),
-          //   ),
-          // ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCarTypeHeading() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        children: [
-          if (isCarTypeSelected)
-            _buildSelectedCarTypeHeading()
-          else
-            _buildInsertCarTypeHeading(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInsertCarTypeHeading() {
-    return Column(
-      children: [
-        // Text(
-        //   "Insert Your\n${widget.carModel} Type",
-        //   style: TextStyle(
-        //     fontSize: 26,
-        //     fontWeight: FontWeight.bold,
-        //     color: Colors.black,
-        //   ),
-        //   textAlign: TextAlign.center,
-        // ),
-        SizedBox(height: 40),
-      ],
-    );
-  }
-
-  Widget _buildSelectedCarTypeHeading() {
-    return Column(
-      children: [
-        SizedBox(height: 45),
-        Text(
-          "Selected Car Type",
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 18),
-      ],
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    return !isCarTypeSelected
-        ? Container(
-            margin: EdgeInsets.symmetric(horizontal: 30, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Padding(
-              padding: EdgeInsets.only(left: 12),
-              child: TextField(
-                focusNode: searchFocusNode,
-                controller: searchController,
-                onChanged: _filterCarTypes,
-                decoration: InputDecoration(
-                  hintText: "Search for car types",
-                  prefixIcon: Icon(Icons.search),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 16,
-                  ),
-                ),
-              ),
-            ),
-          )
-        : Container();
-  }
-
-  Widget _buildSelectedCarType() {
-    final selectedCar = carTypes.firstWhere(
-      (carType) => carType.productName == selectedCarType,
-      orElse: () => CarData('', '', '', '', '', ''),
-    );
-
-    return selectedCarType.isNotEmpty
-        ? Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 50),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 75),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      selectedCar.productBrandLogoPath,
-                      height: 40,
-                      width: 40,
-                    ),
-                    SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          selectedCarType.split(' ').sublist(1).join(' '),
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          selectedCarType.split(' ')[0],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 30),
-              Image.asset(
-                selectedCar.productImagePath,
-                height: 200,
-                width: 280,
-                fit: BoxFit.contain,
-              ),
-              SizedBox(height: 40),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: _clearSelection,
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      side: BorderSide(
-                        width: 0.8,
-                        color: Colors.grey,
-                      ),
-                      minimumSize: Size(320, 50),
-                    ),
-                    child: Text("Clear", style: TextStyle(fontSize: 15)),
-                  ),
-                  SizedBox(height: 25),
-                  // ElevatedButton(
-                  //   onPressed: () {
-                  //     _navigateToVehicleHeightScreen(context, selectedCar);
-                  //   },
-                  //   style: ElevatedButton.styleFrom(
-                  //     shape: RoundedRectangleBorder(
-                  //       borderRadius: BorderRadius.circular(100),
-                  //     ),
-                  //     minimumSize: Size(320, 50),
-                  //   ),
-                  //   child: Text("Continue", style: TextStyle(fontSize: 15)),
-                  // ),
-                ],
-              ),
-              SizedBox(height: 12),
-            ],
-          )
-        : Container();
-  }
-
-  Widget _buildFilteredCarTypeList() {
-    return filteredCarTypes.isEmpty
-        ? Container()
-        : Container(
-            margin: EdgeInsets.symmetric(horizontal: 40),
-            child: ListView.separated(
-              shrinkWrap: true,
-              itemCount: filteredCarTypes.length,
-              separatorBuilder: (context, index) => Divider(
-                color: Colors.grey[300],
-                thickness: 1.5,
-                height: 1,
-              ),
-              itemBuilder: (context, index) {
-                final carType = filteredCarTypes[index];
-                return GestureDetector(
-                  onTap: () {
-                    _navigateToCarDetails(context, carType);
-                  },
-                  child: ListTile(
-                    title: _buildCarTypeText(carType),
-                    leading: _buildCarTypeIcon(carType),
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 15,
-                      horizontal: 12,
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-  }
-
-  Widget _buildCarTypeIcon(CarData carType) {
-    return Image.asset(
-      carType.productBrandLogoPath,
-      height: 35,
-      width: 35,
-    );
-  }
-
-  Widget _buildCarTypeText(CarData carType) {
-    final carTypeParts = carType.productName.split(' ');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: carTypeParts.sublist(1).join(' '),
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              TextSpan(
-                text: '\n${carTypeParts[0]}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // AutomaticKeepAliveClientMixin requirement
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(context),
-            SizedBox(height: 30),
-            _buildCarTypeHeading(),
-            _buildSearchBar(context),
-            _buildSelectedCarType(),
-            _buildFilteredCarTypeList(),
-          ],
-        ),
+      appBar: AppBar(
+        title: Text('Search Screen'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                searchText = value;
+                filterProducts();
+              },
+              decoration: InputDecoration(
+                labelText: 'Search',
+                hintText: 'Search for items...',
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredMotorcycles.length,
+              itemBuilder: (context, index) {
+                final motorcycle = filteredMotorcycles[index];
+                return ListTile(
+                  title: Text(motorcycle.product_name),
+                  onTap: () {
+                    Get.to(CustomGroundClearanceScreen(
+                        vehicle: motorcycle, userToken: userToken));
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

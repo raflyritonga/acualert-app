@@ -6,31 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'registration_success_screen.dart';
-// class Car {
-//   final String product_name;
-//   final String product_brand;
-//   final String product_type;
-//   final num ground_clearance;
-//   final String product_brand_logo_token;
-//   final String product_image_token;
-
-//   Car({
-//     required this.product_name,
-//     required this.product_brand,
-//     required this.product_type,
-//     required this.ground_clearance,
-//     required this.product_brand_logo_token,
-//     required this.product_image_token,
-//   });
-
-//   String toString() {
-//     return 'Car{product_name: $product_name, product_brand: $product_brand, ground_clearance: $ground_clearance, product_type: $product_type, product_image_token: $product_image_token, product_brand_logo_token: $product_brand_logo_token}';
-//   }
-// }
 
 class SuperCustomCupertinoPicker extends CupertinoPicker {
   SuperCustomCupertinoPicker({
@@ -50,10 +28,10 @@ class SuperCustomCupertinoPicker extends CupertinoPicker {
 }
 
 class CustomGroundClearanceScreen extends StatefulWidget {
-  final car;
+  final vehicle;
   final userToken;
   const CustomGroundClearanceScreen(
-      {required this.car, required this.userToken, Key? key})
+      {required this.vehicle, required this.userToken, Key? key})
       : super(key: key);
   @override
   _CustomGroundClearanceScreenState createState() =>
@@ -74,17 +52,15 @@ class _CustomGroundClearanceScreenState
   @override
   void initState() {
     super.initState();
-    defaultGroundClearance = widget.car.ground_clearance;
+    defaultGroundClearance = widget.vehicle.ground_clearance;
     customGroundClearance = 90;
-    // defaultGroundClearance = widget.car.ground_clearance;
-    // defaultGroundClearance = widget.car?.ground_clearance ?? 0;
     print('default ground clearance = ${defaultGroundClearance}');
     print('custom ground clearance = ${customGroundClearance}');
     decodingTokenChecker();
   }
 
   void _navigateBack(BuildContext context) {
-    Navigator.pop(context, widget.car);
+    Navigator.pop(context, widget.vehicle);
   }
 
   void _navigateToRegistrationSuccessScreen(BuildContext context) {
@@ -112,10 +88,10 @@ class _CustomGroundClearanceScreenState
           children: [
             _buildHeader(context),
             SizedBox(height: 50),
-            _buildCarDetails(),
+            _buildVehicleDetails(),
             SizedBox(height: 30),
             Image.network(
-              'https://firebasestorage.googleapis.com/v0/b/acualert-services-2023.appspot.com/o/vehicles%2FlandCruiser%202.jpg?alt=media&token=2a4403ee-0eb0-46c2-a16a-342eb0698f1e',
+              widget.vehicle.product_image_token,
               height: 180,
               width: 180,
               fit: BoxFit.contain,
@@ -147,30 +123,21 @@ class _CustomGroundClearanceScreenState
             "Step 3 of 3",
             style: TextStyle(color: Colors.black),
           ),
-          TextButton(
-            onPressed: () {
-              // Logic to skip
-            },
-            child: Text(
-              "Skip",
-              style: TextStyle(color: Colors.black),
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildCarDetails() {
+  Widget _buildVehicleDetails() {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           SizedBox(width: 25),
           Image.network(
-            'https://firebasestorage.googleapis.com/v0/b/acualert-services-2023.appspot.com/o/vehicles%2FlandCruiser%202.png?alt=media&token=85dad9c1-258b-4090-ae72-f50170d86ff4',
-            height: 60,
-            width: 60,
+            widget.vehicle.product_brand_logo_token,
+            height: 40,
+            width: 40,
             fit: BoxFit.contain,
           ),
           SizedBox(width: 20),
@@ -178,7 +145,7 @@ class _CustomGroundClearanceScreenState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.car.product_name.split(' ')[0],
+                widget.vehicle.product_name.split(' ')[0],
                 style: TextStyle(
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
@@ -187,7 +154,7 @@ class _CustomGroundClearanceScreenState
               ),
               SizedBox(height: 3),
               Text(
-                widget.car.product_brand.split(' ')[0],
+                widget.vehicle.product_brand.split(' ')[0],
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
@@ -430,11 +397,13 @@ class _CustomGroundClearanceScreenState
       padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
       child: ElevatedButton(
         onPressed: () async {
-          await addVehicle(userId, "cars",
-              widget.car.product_name.toLowerCase(), customGroundClearance);
+          await addVehicle(userId, widget.vehicle.vehicle_type,
+              widget.vehicle.product_name.toLowerCase(), customGroundClearance);
           if (customGroundClearance != 0) {
-            await updateGroundClearance(userId,
-                widget.car.product_name.toLowerCase(), customGroundClearance);
+            await updateGroundClearance(
+                userId,
+                widget.vehicle.product_name.toLowerCase(),
+                customGroundClearance);
           }
           _navigateToRegistrationSuccessScreen(context);
         },
