@@ -1,6 +1,23 @@
+import 'package:acualert/app/modules/home/views/home_screen.dart';
 import 'package:flutter/material.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  final usertoken;
+  final user;
+  const ProfileScreen({required this.usertoken, required this.user, super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    print(widget.user);
+    print(widget.usertoken);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -18,7 +35,7 @@ class ProfilePage extends StatelessWidget {
               children: [
                 SizedBox(width: 5),
                 CircleAvatar(
-                  backgroundImage: AssetImage('assets/hiskia.png'),
+                  backgroundImage: AssetImage('assets/avatar.png'),
                   radius: 30,
                 ),
                 SizedBox(width: 20),
@@ -34,7 +51,7 @@ class ProfilePage extends StatelessWidget {
                     ),
                     SizedBox(height: 8),
                     Text(
-                      'Hiskia Sinaga',
+                      widget.user.fullName,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -64,10 +81,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 TextFormField(
-                  // Tambahkan controller dan validator sesuai kebutuhan
-                  decoration: InputDecoration(
-                    hintText: 'Hiskia Tri Bekana Sinaga',
-                  ),
+                  initialValue: widget.user.fullName,
                 ),
                 SizedBox(height: 25),
                 Text(
@@ -78,10 +92,9 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 TextFormField(
+                  initialValue: widget.user.email,
+                  readOnly: true,
                   // Tambahkan controller dan validator sesuai kebutuhan
-                  decoration: InputDecoration(
-                    hintText: 'hiskiasng@gmail.com',
-                  ),
                 ),
                 SizedBox(height: 25),
                 Text(
@@ -92,10 +105,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 TextFormField(
-                  // Tambahkan controller dan validator sesuai kebutuhan
-                  decoration: InputDecoration(
-                    hintText: '+6282284583788',
-                  ),
+                  initialValue: widget.user.phone,
                 ),
                 SizedBox(height: 15),
               ],
@@ -119,10 +129,12 @@ class ProfilePage extends StatelessWidget {
                   ),
                   child: Text('Update Profile'),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
                     // Tambahkan logika untuk tombol "Sign Out" di sini
+                    // tinky, winky, dipsy, lala, puhhhhhhh, sepuhhhhhh
+
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -138,6 +150,11 @@ class ProfilePage extends StatelessWidget {
             ),
           ),
         ],
+        /* 
+          I LOVE semprot.com
+        
+         */
+
       ),
     );
   }

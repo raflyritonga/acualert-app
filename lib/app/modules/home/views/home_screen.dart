@@ -9,24 +9,6 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:http/http.dart' as http;
 import 'package:jwt_decoder/jwt_decoder.dart';
 
-class User {
-  String fullName;
-  String email;
-  String phone;
-  List<Vehicle> vehicles;
-
-  User({
-    required this.fullName,
-    required this.email,
-    required this.phone,
-    required this.vehicles,
-  });
-
-  String toString() {
-    return 'User{full_name: $fullName, email: $email, phone: $phone, vehicles: $vehicles';
-  }
-}
-
 class Vehicle {
   String productName;
   String productBrand;
@@ -47,6 +29,24 @@ class Vehicle {
   });
 }
 
+class User {
+  String fullName;
+  String email;
+  String phone;
+  List<Vehicle> vehicles;
+
+  User({
+    required this.fullName,
+    required this.email,
+    required this.phone,
+    required this.vehicles,
+  });
+
+  String toString() {
+    return 'User{full_name: $fullName, email: $email, phone: $phone, vehicles: $vehicles';
+  }
+}
+
 class HomeScreen extends StatefulWidget {
   final userToken;
   const HomeScreen({required this.userToken, Key? key}) : super(key: key);
@@ -55,7 +55,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 List<VehicleCard> _vehicleCards = [];
-late User user;
+late User user = new User(fullName: '', email: '', phone: '', vehicles: []);
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 1; // Active index on the home page
@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> vehicleDataMap = data['vehicles'];
+
         final List<Vehicle> vehicles = vehicleDataMap.values.map((vehicleData) {
           return Vehicle(
             productName: vehicleData['product-name'],
@@ -102,14 +103,16 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }).toList();
 
-        user = User(
+        print(data);
+        print(user);
+        print(vehicles[0].productName);
+
+        return user = User(
           fullName: data['fullName'],
           email: data['email'],
           phone: data['phone'],
           vehicles: vehicles,
         );
-
-        return user; // Return the fetched user data // Return the fetched user data
       } else {
         print('API Request failed with status code: ${response.statusCode}');
         print('Response body: ${response.body}');
@@ -125,10 +128,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     decodingTokenChecker();
-    fetchUserData().then((_) {
-      print(user);
+    fetchUserData().then((fetchedUser) {
       setState(() {
-        _vehicleCards = user.vehicles.map((vehicle) {
+        _vehicleCards = fetchedUser.vehicles.map((vehicle) {
           return VehicleCard(
             productName: vehicle.productName,
             productBrand: vehicle.productBrand,
@@ -140,14 +142,17 @@ class _HomeScreenState extends State<HomeScreen> {
         }).toList();
       });
     });
+    print(_vehicleCards);
+    print(user);
     print('user token di home: ' + widget.userToken);
   }
 
   final List<Widget> _pages = [
-    ProfilePage(),
+    ProfileScreen(usertoken: userToken, user: user),
     HomeContent(),
     MapPage(),
   ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -227,24 +232,26 @@ class _HomeContentState extends State<HomeContent> {
         ),
         SizedBox(
             height: 40), // Beri jarak antara "Your Vehicle" dan CarouselSlider
-        Transform.scale(
-          scale: 1.08,
-          child: CarouselSlider(
-            options: CarouselOptions(
-              height: 240, // Sesuaikan tinggi carousel
-              viewportFraction: 0.65, // Tetapkan viewportFraction ke 0.8
-              enlargeCenterPage: true,
-              autoPlay: false, // Matikan autoPlay
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _currentIndex =
-                      index; // Atur currentIndex sesuai dengan perubahan halaman CarouselSlider
-                });
-              },
-            ),
-            items: _vehicleCards,
-          ),
-        ),
+        _vehicleCards.isEmpty
+            ? CircularProgressIndicator() // Show a loading indicator while fetching data
+            : Transform.scale(
+                scale: 1.08,
+                child: CarouselSlider(
+                  options: CarouselOptions(
+                    height: 240, // Sesuaikan tinggi carousel
+                    viewportFraction: 0.65, // Tetapkan viewportFraction ke 0.8
+                    enlargeCenterPage: true,
+                    autoPlay: false, // Matikan autoPlay
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _currentIndex =
+                            index; // Atur currentIndex sesuai dengan perubahan halaman CarouselSlider
+                      });
+                    },
+                  ),
+                  items: _vehicleCards,
+                ),
+              ),
         SizedBox(height: 30),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -474,7 +481,7 @@ class RoundedCard extends StatelessWidget {
           children: [
             SizedBox(width: 5),
             CircleAvatar(
-              backgroundImage: AssetImage('assets/hiskia.png'),
+              backgroundImage: AssetImage('assets/avatar.png'),
               radius: 30,
             ),
             SizedBox(width: 20),
@@ -490,7 +497,7 @@ class RoundedCard extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Hehehe',
+                  user.fullName,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
