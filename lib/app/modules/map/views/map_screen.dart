@@ -1,11 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:acualert/app/config/config.dart';
+import 'package:acualert/app/modules/map/views/map_on_use.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:http/http.dart' as http;
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyGMap(),
+    );
+  }
+}
 
 class MyGMap extends StatefulWidget {
   const MyGMap({super.key});
@@ -30,11 +44,6 @@ class _MyGMapState extends State<MyGMap> {
   void initState() {
     super.initState();
     getLocationUpdates().then((_) => _fetchDirections());
-
-    // then((_) => {
-    //       getPolylinesPoint()
-    //           .then((coordinates) => {generatePolyLineFromPoints(coordinates)}),
-    //     }));
   }
 
   @override

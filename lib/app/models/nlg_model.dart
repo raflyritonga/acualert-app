@@ -1,13 +1,11 @@
 import 'dart:math';
 
-import 'package:flutter/widgets.dart';
-
 class BanjirInfoModel {
   late String namaPengguna;
   late String jenisKendaraan;
   late num ketinggianAir;
   late num ketinggianCasis;
-  List<String> lokasiList;
+  late String lokasi;
 
   List<String> textPenyertaList = [
     "Jalanan terendam banjir di sekitar",
@@ -34,7 +32,7 @@ class BanjirInfoModel {
   ];
 
   BanjirInfoModel(this.namaPengguna, this.jenisKendaraan, this.ketinggianAir,
-      this.ketinggianCasis, this.lokasiList);
+      this.ketinggianCasis, this.lokasi);
 
   String randomChoice(List<String> arr) {
     return arr[Random().nextInt(arr.length)];
@@ -43,7 +41,7 @@ class BanjirInfoModel {
   String generateKalimat1() {
     final namaPengguna = this.namaPengguna;
     final textPenyerta = randomChoice(textPenyertaList);
-    final lokasi = randomChoice(lokasiList);
+    final lokasi = this.lokasi;
 
     final templateChoices = [
       '$textPenyerta $lokasi nih, $namaPengguna!',
@@ -83,8 +81,8 @@ class BanjirInfoModel {
   }
 
   String generateBanjirInfo() {
-    final ketinggianAir = this.ketinggianAir;
-    final ketinggianCasis = this.ketinggianCasis;
+    // final ketinggianAir = this.ketinggianAir;
+    // final ketinggianCasis = this.ketinggianCasis;
 
     if (ketinggianAir > ketinggianCasis) {
       final kalimatUtuh =
@@ -95,15 +93,3 @@ class BanjirInfoModel {
     return 'Kendaraan aman untuk melintas.';
   }
 }
-
-// void main() {
-//   final banjirModel = BanjirInfoModel('Budi Santoso', 'Scoopy', 7, 3, [
-//     "Jl. Selayang",
-//     "Jl. Kapten Muslim",
-//     "Jl. Ahmad Yani",
-//     "Jl. M.T. Haryono",
-//     "Jl. Universitas"
-//   ]);
-
-//   print(banjirModel.generateBanjirInfo());
-// }

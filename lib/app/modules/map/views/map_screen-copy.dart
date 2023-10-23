@@ -8,6 +8,20 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' as Math;
 
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyGMap(),
+    );
+  }
+}
+
 LatLng sourceLocation = LatLng(3.599583407371077, 98.69090554634903);
 LatLng destinationLoc = LatLng(3.5901166131080515, 98.68987928369069);
 

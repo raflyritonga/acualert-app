@@ -1,4 +1,3 @@
-import 'package:acualert/app/modules/auths/controllers/signin_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:msh_checkbox/msh_checkbox.dart';
@@ -22,7 +21,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen> {
     super.initState();
     _playSuccessSound();
     _startAnimation();
-    print('user token di screen: ' + userToken);
+    print('user token di screen: ' + widget.userToken);
   }
 
   Future<void> _playSuccessSound() async {
@@ -90,7 +89,7 @@ class _RegistrationSuccessScreenState extends State<RegistrationSuccessScreen> {
               SizedBox(height: 80),
               ElevatedButton(
                 onPressed: () {
-                  Get.offAllNamed('/home', arguments: userToken);
+                  Get.offAllNamed('/home', arguments: widget.userToken);
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(

@@ -1,8 +1,6 @@
-import 'package:acualert/app/modules/vehichle_registration/views/registration_success_screen.dart';
 import 'package:get/get.dart';
 // Screens
 import 'package:acualert/app/modules/vehichle_registration/views/car_selection_screen.dart';
-import 'package:acualert/app/modules/vehichle_registration/views/custom_ground_clearance_screen.dart';
 import 'package:acualert/app/modules/vehichle_registration/views/motorcycle_selection_screen.dart';
 import 'package:acualert/app/modules/vehichle_registration/views/vehicle_type_selection_screen.dart';
 import 'package:acualert/app/routes/route_names.dart';

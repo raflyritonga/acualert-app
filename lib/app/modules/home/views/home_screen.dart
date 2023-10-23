@@ -524,7 +524,7 @@ class _VehicleCardState extends State<VehicleCard> {
                           userFullName: user.fullName,
                           selectedVehicle: widget.productName,
                           selectedVehicleGroundClearance:
-                              widget.groundClearance),
+                              num.parse(widget.groundClearance)),
                     ));
                   },
                 ),
